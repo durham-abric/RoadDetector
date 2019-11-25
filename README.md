@@ -1,15 +1,4 @@
-**Marathon Match - Solution Description**
-
-**Overview**
-
-1.	Introduction
-Tell us a bit about yourself, and why you have decided to participate in the contest.
-
-    Name: Alexander Buslaev
-    Handle: albu
-
-
-**2.** **Solution Development**
+**Solution Development**
 
 How did you solve the problem? What approaches did you try and what choices did you make, and why? Also, what alternative approaches did you consider?
 
@@ -20,7 +9,7 @@ How did you solve the problem? What approaches did you try and what choices did 
 - **●●** After it, I tried some architectures based on resnet34/resnet50/inceptionv3 encoders and unet-like decoder.
 - **●●** The hardest part was to transform probability map to a graph. I found sknw package in github and ran it on binarized probability maps. Most annoying problems were – gaps due to not perfect segmentation (mostly on crossroads), multigraphs, noise, and uncertainty on borders. I will describe solutions for them in next section.
 
-**3.** **Final Approach**
+**Final Approach**
 
 Please provide a bulleted description of your final approach. What ideas/decisions/features have been found to be the most important for your solution performance:
 
@@ -51,7 +40,7 @@ Image to graph part:
 
 \* connect with other if they lie on almost on one line and distance lesser then 200pix
 
-**4.** **Open Source Resources, Frameworks and Libraries**
+**Open Source Resources, Frameworks and Libraries**
 
 Please specify the name of the open source resource along with a URL to where it&#39;s housed and it&#39;s license type:
 
@@ -70,34 +59,3 @@ Please specify the name of the open source resource along with a URL to where it
 - APLS ( [https://github.com/CosmiQ/apls](https://github.com/CosmiQ/apls)) and it&#39;s requirements
 - Numba ( [https://pypi.python.org/pypi/numba](https://pypi.python.org/pypi/numba)) BSD
 - Pandas ( [https://pypi.python.org/pypi/pandas](https://pypi.python.org/pypi/pandas)), BSD
-
-**5.** **Potential Algorithm Improvements**
-
-Please specify any potential improvements that can be made to the algorithm:
-
--
-  -
-    - Use tile adjacency information
-    - Find more data
-    - Maybe somehow add OSM information
-    - Maybe try other network architectures (wideresnet38?)
-    - Stack more networks (on different hyperparameters, scales, crops)
-
-**6.** **Algorithm Limitations**
-
-Please specify any potential limitations with the algorithm:
-
-   **●●** It should not generalize to new kinds of data (big difference in weather conditions, zoom, etc); it is limitation for all machine learning algorithms.
-
-**7.** **Deployment Guide**
-
-Please provide the exact steps required to build and deploy the code:
-
-   **1.** Please use steps from Dockerfile. If you use clean system – you also need to install nvidia driver, cuda 8, cudnn 6.
-
-**8.** **Final Verification**
-
-Please provide instructions that explain how to train the algorithm and have it execute against sample data:
-
-   **1.** It&#39;s mostly described in &quot;final verification&quot; document
-
