@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-docker images -q --filter "dangling=true" | xargs docker rmi
+docker images -q --filter "dangling=true" | xargs docker rmi model:latest

@@ -1,1 +1,1 @@
-nvidia-docker build -t albu .
+nvidia-docker build -t model .
