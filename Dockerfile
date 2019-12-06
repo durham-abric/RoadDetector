@@ -21,8 +21,4 @@ ENV LD_LIBRARY_PATH /miniconda/lib:${LD_LIBRARY_PATH}
 RUN apt install -y libgl1-mesa-glx
 ADD weights /results/weights/
 ADD ["train.sh", "test.sh", "train_single.sh", "/"]
-<<<<<<< HEAD
 ADD src /opt/app/src/
-=======
-ADD src /opt/app/src/
->>>>>>> 21e0ddeeed234a3192f2dc78c4b914441c8e20ec
