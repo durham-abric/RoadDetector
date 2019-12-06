@@ -14,4 +14,4 @@ utm
 rtree
 tensorboardX
 numba==0.36.2
-pandas==0.25.3
+pandas==0.24.2

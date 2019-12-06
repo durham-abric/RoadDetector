@@ -1,3 +1,4 @@
+  
 # run only on GPU instance and with --ipc=host option
 FROM nvidia/cuda:9.0-cudnn7-devel-ubuntu16.04
 
@@ -21,5 +22,3 @@ RUN apt install -y libgl1-mesa-glx
 ADD weights /results/weights/
 ADD ["train.sh", "test.sh", "train_single.sh", "/"]
 ADD src /opt/app/src/
-RUN conda create -n geo_env -c conda-forge gdal
-RUN activate geo_env
