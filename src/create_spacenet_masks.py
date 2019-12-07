@@ -59,7 +59,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('datasets', type=str, nargs='+')
     parser.add_argument('--training', action='store_true')
-    parser.add_argument('--save', action='store_true')
+    parser.add_argument('--rgb', action='store_true')
+    parser.add_argument('--mul', action='store_true')
+    parser.add_argument('--pan', action='store_true')
     args = parser.parse_args()
     buffer_meters = 2
     burnValue = 255
@@ -67,10 +69,12 @@ def main():
     path_apls = r'/wdata'
     path_png = os.path.join(path_apls, 'output_png')
     test = not args.training
-    save_png = args.save
+    save_rgb = args.rgb
+    save_mul = args.mul
+    save_pan = args.pan
     path_outputs = os.path.join(path_apls, 'train' if not test else 'test', 'masks{}m'.format(buffer_meters))
     path_images_8bit = os.path.join(path_apls, 'train' if not test else 'test', 'images')
-    for d in [path_outputs, path_images_8bit]:
+    for d in [path_outputs, path_images_8bit, path_png]:
         shutil.rmtree(d, ignore_errors=True)
         os.makedirs(d, exist_ok=True)
 
@@ -79,6 +83,8 @@ def main():
         test_data_name = os.path.split(path_data)[-1]
         test_data_name = '_'.join(test_data_name.split('_')[:3]) + '_'
         path_images_raw = os.path.join(path_data, 'RGB-PanSharpen')
+        path_images_mul = os.path.join(path_data, 'MUL')
+        path_images_pan = os.path.join(path_data, 'PAN')
         path_labels = os.path.join(path_data, 'geojson/spacenetroads')
         # iterate through images, convert to 8-bit, and create masks
         im_files = os.listdir(path_images_raw)
@@ -92,7 +98,10 @@ def main():
             # create 8-bit image
             im_file_raw = os.path.join(path_images_raw, im_file)
             im_file_out = os.path.join(path_images_8bit, test_data_name + name_root + '.tif')
-            im_file_png = os.path.join(path_png,test_data_name + name_root + "_raw.png")
+            im_file_rgb = os.path.join(path_png,test_data_name + name_root + "_rgb.png")
+            im_file_mul = os.path.join(path_png,test_data_name + name_root + "_mul.png")
+            im_file_pan = os.path.join(path_png,test_data_name + name_root + "_pan.png")
+
 
             # continue
             rescale_type = test_data_name.split('_')[1]
@@ -103,10 +112,23 @@ def main():
                                            rescale_type=rescale[rescale_type],
                                            percentiles=[2,98])
             
-            if not os.path.isfile(im_file_png) and save_png:
-                apls_tools.convert_to_8Bit(im_file_raw, im_file_png,
+            if not os.path.isfile(im_file_rgb) and save_rgb:
+                apls_tools.convert_to_8Bit(im_file_raw, im_file_rgb,
                                            outputPixType='Byte',
-                                           outputFormat='png')
+                                           outputFormat='png',
+                                           percentiles=[0,100])
+            
+            if not os.path.isfile(im_file_mul) and save_mul:
+                apls_tools.convert_to_8Bit(im_file_mul, im_file_mul,
+                                           outputPixType='Byte',
+                                           outputFormat='png',
+                                           percentiles=[0,100])
+
+            if not os.path.isfile(im_file_pan) and save_pan:
+                apls_tools.convert_to_8Bit(im_file_pan, im_file_pan,
+                                           outputPixType='Byte',
+                                           outputFormat='png',
+                                           percentiles=[0,100])
 
             if test:
                 continue
