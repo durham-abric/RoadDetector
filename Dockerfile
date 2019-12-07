@@ -10,12 +10,12 @@ RUN chmod +x Miniconda3-${VERSION}-Linux-x86_64.sh
 RUN ./Miniconda3-${VERSION}-Linux-x86_64.sh -b -f -p /miniconda
 RUN mkdir -p /root/.torch/models
 RUN wget https://download.pytorch.org/models/resnet34-333f7ec4.pth -P /root/.torch/models
+RUN conda install -y conda
 RUN conda config --add channels conda-forge
 RUN conda config --set channel_priority strict
 RUN conda install -y shapely
-RUN conda install -y conda=4.4.7
 RUN conda install -y osmnx
-RUN conda install -y gdal libgdal
+RUN conda install -y gdal=2.2.4 libgdal=2.2.4
 RUN conda install -y torchvision==0.2.0 pytorch==0.3.0 cuda80 -c pytorch
 ADD requirements.txt requirements.txt
 RUN pip install -r requirements.txt
