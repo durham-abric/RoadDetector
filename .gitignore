@@ -1,3 +1,6 @@
 *.pth
 *.tar
 *.tar.gz
+*.png
+*.tif
+*.tiff
