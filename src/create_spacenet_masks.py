@@ -12,6 +12,7 @@ from collections import defaultdict
 from osgeo import gdal
 import numpy as np
 import shutil
+from skimage import io
 
 # add path and import apls_tools
 from other_tools import apls_tools
@@ -58,12 +59,15 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('datasets', type=str, nargs='+')
     parser.add_argument('--training', action='store_true')
+    parser.add_argument('--save', action='store_true')
     args = parser.parse_args()
     buffer_meters = 2
     burnValue = 255
 
     path_apls = r'/wdata'
+    path_png = os.path.join(path_apls, 'output_png')
     test = not args.training
+    save_png = args.save
     path_outputs = os.path.join(path_apls, 'train' if not test else 'test', 'masks{}m'.format(buffer_meters))
     path_images_8bit = os.path.join(path_apls, 'train' if not test else 'test', 'images')
     for d in [path_outputs, path_images_8bit]:
@@ -76,7 +80,6 @@ def main():
         test_data_name = '_'.join(test_data_name.split('_')[:3]) + '_'
         path_images_raw = os.path.join(path_data, 'RGB-PanSharpen')
         path_labels = os.path.join(path_data, 'geojson/spacenetroads')
-
         # iterate through images, convert to 8-bit, and create masks
         im_files = os.listdir(path_images_raw)
         m = defaultdict(list)
@@ -89,9 +92,8 @@ def main():
             # create 8-bit image
             im_file_raw = os.path.join(path_images_raw, im_file)
             im_file_out = os.path.join(path_images_8bit, test_data_name + name_root + '.tif')
-            # convert to 8bit
+            im_file_png = os.path.join(path_png,test_data_name + name_root + "_raw.png")
 
-            # m = calc_rescale(im_file_raw, m, percentiles=[2,98])
             # continue
             rescale_type = test_data_name.split('_')[1]
             if not os.path.isfile(im_file_out):
@@ -100,6 +102,11 @@ def main():
                                            outputFormat='GTiff',
                                            rescale_type=rescale[rescale_type],
                                            percentiles=[2,98])
+            
+            if not os.path.isfile(im_file_png) and save_png:
+                apls_tools.convert_to_8Bit(im_file_raw, im_file_png,
+                                           outputPixType='Byte',
+                                           outputFormat='png')
 
             if test:
                 continue

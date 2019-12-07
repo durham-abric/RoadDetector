@@ -1,4 +1,5 @@
 from skimage.morphology import skeletonize, remove_small_objects, remove_small_holes
+from skimage import io
 import numpy as np
 from matplotlib.pylab import plt
 import cv2
@@ -101,8 +102,8 @@ def graph2lines(G):
     return node_lines
 
 
-def visualize(img, G, vertices):
-    plt.imshow(img, cmap='gray')
+def visualize(img, G, vertices, fn):
+    plt.imshow(img)
 
     # draw edges by pts
     for (s, e) in G.edges():
@@ -112,22 +113,24 @@ def visualize(img, G, vertices):
             plt.plot(ps[:, 1], ps[:, 0], 'green')
 
     # draw node by o
-    node, nodes = G.node(), G.nodes
+    #node, nodes = G.node(), G.nodes
     # deg = G.degree
     # ps = np.array([node[i]['o'] for i in nodes])
     ps = np.array(vertices)
     plt.plot(ps[:, 1], ps[:, 0], 'r.')
 
     # title and show
-    plt.title('Build Graph')
-    plt.show()
+    img_name = fn.split('.')[0] + ".png"
+    map_name = fn.split('.')[0] + "_roads.png"
+    io.imsave(img_name, img)
+    plt.savefig(map_name)
 
 def line_points_dist(line1, pts):
     return np.cross(line1[1] - line1[0], pts - line1[0]) / np.linalg.norm(line1[1] - line1[0])
 
 def remove_small_terminal(G):
     deg = G.degree()
-    terminal_points = [i for i, d in deg.items() if d == 1]
+    terminal_points = [i for i, d in deg if d == 1]
     edges = list(G.edges())
     for s, e in edges:
         if s == e:
@@ -153,7 +156,8 @@ def make_skeleton(root, fn, debug, threshes, fix_borders):
     clip = 2
     rec = replicate + clip
     # open and skeletonize
-    img = cv2.imread(os.path.join(root, fn), cv2.IMREAD_GRAYSCALE)
+    img_path = os.path.join(root, fn)
+    img = io.imread(img_path)
     assert img.shape == (1300, 1300)
     if fix_borders:
         img = cv2.copyMakeBorder(img, replicate, replicate, replicate, replicate, cv2.BORDER_REPLICATE)
@@ -175,7 +179,7 @@ def make_skeleton(root, fn, debug, threshes, fix_borders):
 
 
 def add_small_segments(G, terminal_points, terminal_lines):
-    node = G.node
+    node = G.nodes
     term = [node[t]['o'] for t in terminal_points]
     dists = squareform(pdist(term))
     possible = np.argwhere((dists > 0) & (dists < 20))
@@ -208,7 +212,7 @@ def add_small_segments(G, terminal_points, terminal_lines):
 
     dists = {}
     for s, e in good_pairs:
-        s_d, e_d = [G.node[s]['o'], G.node[e]['o']]
+        s_d, e_d = [G.nodes[s]['o'], G.nodes[e]['o']]
         dists[(s, e)] = np.linalg.norm(s_d - e_d)
 
     dists = OrderedDict(sorted(dists.items(), key=lambda x: x[1]))
@@ -219,7 +223,7 @@ def add_small_segments(G, terminal_points, terminal_lines):
         if s not in added and e not in added:
             added.add(s)
             added.add(e)
-            s_d, e_d = G.node[s]['o'], G.node[e]['o']
+            s_d, e_d = G.nodes[s]['o'], G.nodes[e]['o']
             line_strings = ["{1:.1f} {0:.1f}".format(*c.tolist()) for c in [s_d, e_d]]
             line = '(' + ", ".join(line_strings) + ')'
             wkt.append(linestring.format(line))
@@ -244,7 +248,7 @@ def add_direction_change_nodes(pts, s, e, s_coord, e_coord):
     return ps
 
 
-def build_graph(root, fn, debug=False, threshes={'2': .3, '3': .3, '4': .3, '5': .2}, add_small=True, fix_borders=True):
+def build_graph(root, fn, debug=True, threshes={'2': .3, '3': .3, '4': .3, '5': .2}, add_small=True, fix_borders=True):
     city = os.path.splitext(fn)[0][5:]
     img_copy, ske = make_skeleton(root, fn, debug, threshes, fix_borders)
     if ske is None:
@@ -254,10 +258,10 @@ def build_graph(root, fn, debug=False, threshes={'2': .3, '3': .3, '4': .3, '5':
     node_lines = graph2lines(G)
     if not node_lines:
         return city, [linestring.format("EMPTY")]
-    node = G.node
+    node = G.nodes
     deg = G.degree()
     wkt = []
-    terminal_points = [i for i, d in deg.items() if d == 1]
+    terminal_points = [i for i, d in deg if d == 1]
 
     terminal_lines = {}
     vertices = []
@@ -312,7 +316,7 @@ def build_graph(root, fn, debug=False, threshes={'2': .3, '3': .3, '4': .3, '5':
 
     if debug:
         vertices = flatten(vertices)
-        visualize(img_copy, G, vertices)
+        visualize(img_copy, G, vertices, fn)
 
     if not wkt:
         return city, [linestring.format("EMPTY")]
@@ -320,7 +324,7 @@ def build_graph(root, fn, debug=False, threshes={'2': .3, '3': .3, '4': .3, '5':
 
 if __name__ == "__main__":
     prefix = 'AOI'
-    results_root = r'/results/results'
+    results_root = r'/results'
     # results_root = r'd:\tmp\roads\albu\results\results'
     # root = os.path.join(results_root, r'results\2m_4fold_512_30e_d0.2_g0.2')
     root = os.path.join(results_root, r'2m_4fold_512_30e_d0.2_g0.2_test', 'merged')

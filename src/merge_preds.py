@@ -37,5 +37,5 @@ def merge_tiffs_defferent_folders(roots, res):
         cv2.imwrite(res_path_geo, prob_arr)
 
 if __name__ == "__main__":
-    root = '/results/results'
+    root = '/results'
     merge_tiffs(os.path.join(root, '2m_4fold_512_30e_d0.2_g0.2_test'))
