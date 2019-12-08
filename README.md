@@ -8,3 +8,6 @@ PARALLEL STEPS IN CODEBASE:
   2.1. python skeleton.py <output>
  
  
+NOTE: Docker container needs to be configured beyond the Dockerfile build. See Report for packages & versions necessary to run.
+
+The program requires GDAL to operate. GDAL is best used from it's own conda environment (conda create geo -c conda-forge gdal).
